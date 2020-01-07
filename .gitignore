@@ -1,0 +1,14 @@
+node_modules
+.env
+.eslintrc.json
+new_staging.yaml
+
+# ignore yarn lock
+yarn.lock
+
+# ignore DS_Store
+.DS_Store
+
+coverage/
+
+**/archive
