@@ -1,0 +1,6 @@
+steps:
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=$_CLUSTER_ZONE'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=$_CLUSTER_NAME'

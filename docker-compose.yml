@@ -1,0 +1,32 @@
+  web:
+    image: maudition:latest
+    environment:
+      DATABASE_URL: postgres://johnboscookoror:root@192.168.99.100:5432/maudition_staging
+    ports:
+      - "8080:8080"
+    # networks:
+    #   - mynetwork
+    volumes:
+      - appdata:/usr/src/app
+
+  postgres:
+    container_name: "psql"
+    image: postgres
+    ports:
+    - "5432:5432"
+    # networks:
+    #   - mynetwork
+    volumes:
+      - postgresdata:/usr/local/bin/psql
+    environment:
+      POSTGRES_USER: johnboscookoror
+      POSTGRES_PASSWORD: root
+
+# networks:
+#   mynetwork:
+#     driver: bridge
+
+# volumes:
+#   appdata:
+#   postgresdata:
+

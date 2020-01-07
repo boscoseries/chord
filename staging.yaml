@@ -1,0 +1,25 @@
+steps:
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/gcb-docker-compose:latest', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--build-arg'
+      - 'buildtime_variable=$_NODE_ENV'
+      - '-t'
+      - gcr.io/$PROJECT_ID/$REPO_NAME:$BUILD_ID
+      - '.'
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/$REPO_NAME:$BUILD_ID']
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - set
+      - image
+      - deployment/maudition-staging-api
+      - $_DEPLOYMENT=gcr.io/$PROJECT_ID/$REPO_NAME:$BUILD_ID
+      - --namespace=staging
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=$_CLUSTER_ZONE'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=$_CLUSTER_NAME'

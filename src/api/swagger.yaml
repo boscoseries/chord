@@ -1,0 +1,2356 @@
+paths:
+  /users:
+    get:
+      summary: returns a list of users
+      tags:
+        - user
+      description: A query that returns the list of all users stored in the database
+      responses:
+        "200":
+          description: returns a list of /users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+  /users/signup:
+    post:
+      summary: create a user
+      tags:
+        - user
+      requestBody:
+        description: object containing a user info
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth_id:
+                    type: string
+                  token:
+                    type: string
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Bad Request
+  /users/signin:
+    post:
+      summary: authenticate a user
+      tags:
+        - user
+      requestBody:
+        description:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auth_id:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Successfully signed in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  token:
+                    type: string
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Unauthorized login
+  /users/{id}/signout:
+    post:
+      summary: Logout of app
+      tags:
+        - user
+      responses:
+        "200":
+          description: Successfully signed out
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Successfully signed out
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Unauthorized login
+      parameters:
+        - name: device_token
+          in: header
+          description: fcm device token
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: user id
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: user id
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+  /users/social-media:
+    post:
+      summary: create a user
+      tags:
+        - user
+      requestBody:
+        description: object containing a user info
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auth_id:
+                  type: string
+                auth_type:
+                  type: string
+                username:
+                  type: string
+                fullname:
+                  type: string
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth_id:
+                    type: string
+                  token:
+                    type: string
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Bad Request
+  /users/otp:
+    post:
+      summary: Get otp
+      tags:
+        - user
+      description: A query that sends an OTP to user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                description: 0987
+        "500":
+          description: An error occurred
+          content: {}
+      parameters:
+        - name: auth_id
+          in: query
+          description: user authentication id, which is their phone number or email
+          required: true
+          schema:
+            type: string
+        - name: auth_type
+          in: query
+          description: authentication type is either "email" or "phone"
+          required: true
+          schema:
+            type: string
+  /users/otp_validation:
+    post:
+      summary: validate otp
+      tags:
+        - user
+      description: A query that validates OTP
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "401":
+          description:
+            content:
+              application/json:
+                schema:
+                  type: boolean
+      parameters:
+        - name: x_request_otp_token
+          in: header
+          description: generated token
+          required: true
+          schema:
+            type: string
+        - name: x_request_auth_id
+          in: header
+          description: user authentication
+          required: true
+          schema:
+            type: string
+        - name: x_request_auth_type
+          in: header
+          description: should be either "email" or "phone"
+          required: true
+          schema:
+            type: string
+  /users/password_otp_validation:
+    post:
+      summary: validate otp
+      tags:
+        - user
+      description: A query that validates OTP
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "401":
+          description:
+            content:
+              application/json:
+                schema:
+                  type: boolean
+      parameters:
+        - name: x_request_otp_token
+          in: header
+          description: generated token
+          required: true
+          schema:
+            type: string
+        - name: x_request_auth_id
+          in: header
+          description: user authentication
+          required: true
+          schema:
+            type: string
+  /users/reset_password:
+    put:
+      summary: Reset user's password
+      tags:
+        - user
+      requestBody:
+        description: A query to reset user's password
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auth_id:
+                  type: string
+                password:
+                  type: string
+                  example: ju839^088
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Password updated successfully
+        "404":
+          description: User not found
+          content: {}
+      parameters:
+        - name: x_request_otp_token
+          in: header
+          description: generated token
+          required: true
+          schema:
+            type: string
+  /users/{id}:
+    get:
+      summary: Gets a user by ID.
+      tags:
+        - user
+      description: A query that returns a user stored in the database
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of user to use
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: ID of  loggedin user to use
+          required: false
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: next set of posts
+          schema:
+            type: integer
+    put:
+      summary: returns an updated user profile
+      tags:
+        - user
+      requestBody:
+        description: A query that allows user to update profile
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Update"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Update"
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of user to use
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+
+  /users/{id}/followers:
+    get:
+      summary: Get all followers
+      tags:
+        - user
+      description: A query that returns all the followers of a user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Follower"
+        "404":
+          description: User not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of user to use
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: loggedin user id
+          schema:
+            type: string
+  /users/{id}/following:
+    get:
+      summary: Get all followers
+      tags:
+        - user
+      description: A query that returns all the followers of a user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Following"
+        "404":
+          description: User not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of user to use
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: loggedin user id
+          schema:
+            type: string
+  /users/{id}/role:
+    put:
+      summary: Assign roles to users
+      tags:
+        - user
+      requestBody:
+        description: Allows admin to assign any of admin or scout role to a user
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role:
+                    type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "403":
+          description: Forbidden
+          content: {}
+        "404":
+          description: User not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of user whose role needs to be assigned
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: admin token for authorization
+          required: true
+          schema:
+            type: string
+  /users/search:
+    get:
+      summary: Finds a user by either name, username or phone number
+      tags:
+        - user
+      description: A query that returns a user based on the search parameter
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: key
+          in: query
+          description: A query that searches for anything based on the passed in query
+          required: true
+          schema:
+            type: string
+        - name: value
+          in: query
+          description: A query that searches for a anything based on the passed in query
+          required: true
+          schema:
+            type: string
+  /users/search/advanced:
+    get:
+      summary: returns user profiles based on advanced search
+      tags:
+        - user
+      description: A query that returns user profiles based on advanced search
+      responses:
+        "200":
+          description: returns a list of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+      parameters:
+        - name: userId
+          in: header
+          description: user id
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: selected categories
+          schema:
+            type: array
+            items:
+              type: string
+        - name: gender
+          in: query
+          description: gender to search for
+          schema:
+            type: string
+        - name: age_range
+          in: query
+          description: Age range to search for
+          schema:
+            type: string
+
+  /users/{id}/updateAvatar:
+    put:
+      summary: Updates user's avatar
+      tags:
+        - user
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                # 'file' will be the field name in this multipart request
+                profileImage:
+                  type: string
+                  format: binary
+
+      responses:
+        "200":
+          description: OK
+          content: {}
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of user to use
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+  /users/follows:
+    post:
+      summary: follow a person
+      tags:
+        - user
+      requestBody:
+        description: A query that allows user to follow or unfollow an person
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                follower_id:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                description: follow or unfollow
+        "401":
+          description: Unauthorized
+          content: {}
+      parameters:
+        - name: follower_id
+          in: body
+          description: post id
+          schema:
+            type: string
+        - name: user_id
+          in: body
+          description: user id
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: device_token
+          in: header
+          description: token for notification
+          schema:
+            type: string
+  /users/{id}/change_password:
+    put:
+      summary: change user password
+      tags:
+        - user
+      requestBody:
+        description: object containing old and new passsword
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old_password:
+                  type: string
+                new_password:
+                  type: string
+      responses:
+        "200":
+          description: Password Changed Successfully
+          content:
+            application/json:
+              type: string
+              example: password changed successfully
+        "404":
+          description: User not found
+          content:
+            application/json:
+              type: string
+              example: Requested user not found
+        "400":
+          description: Wrong inputs
+          content:
+            application/json:
+              type: string
+              example: Wrong inputed data
+        "500":
+          description: Something Wrong
+          content:
+            application/json:
+              type: string
+              example: Some error occurred
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+  /users/forgot_password:
+    post:
+      summary: Reset user's password
+      tags:
+        - user
+      requestBody:
+        description: object containing old and new passsword
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auth_id:
+                  type: string
+      responses:
+        "200":
+          description: OTP sent successfully
+          content:
+            application/json:
+              type: string
+              example: OTP sent successfully
+        "404":
+          description: User not found
+          content:
+            application/json:
+              type: string
+              example: Requested user not found
+  /users/{id}/liked:
+    get:
+      summary: A query that returns all the posts that a user has liked
+      tags:
+        - user
+      responses:
+        "200":
+          description: get all user's liked posts
+          content:
+            application/json:
+              schema:
+                type: string
+                description:
+        "404":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Not found
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: user ID
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: user id
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: next set of posts
+          schema:
+            type: integer
+  /posts/newpost:
+    post:
+      summary: creates a new post
+      tags:
+        - post
+      requestBody:
+        description: object containing a post info
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                # 'file' will be the field name in this multipart request
+                media_url:
+                  type: string
+                  format: binary
+                thumbnail_url:
+                  type: string
+                  format: binary
+                user_id:
+                  type: string
+                category_id:
+                  type: string
+                hashtag:
+                  type: array
+                  items:
+                    type: string
+                caption:
+                  type: string
+                post_duration:
+                  type: number
+                  description: in seconds
+                  format: integer
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: string
+                description: CREATED
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Bad Request
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: user ID
+          schema:
+            type: string
+  /posts/newsfeed:
+    get:
+      summary: returns a list of all posts
+      tags:
+        - post
+      description: A query that returns the list of all posts
+      responses:
+        "200":
+          description: returns a lists of all posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: User ID
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: next set of posts
+          schema:
+            type: integer
+  /posts/newsfeed/personalized:
+    get:
+      summary: returns a list of all posts by followers
+      tags:
+        - post
+      description: A query that returns the list of all posts by followers
+      responses:
+        "200":
+          description: returns a list of all posts by followers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: User ID
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: next set of posts
+          schema:
+            type: integer
+  /posts/likes:
+    post:
+      summary: Likes a post
+      tags:
+        - post
+      requestBody:
+        description: A query that allows user to like or unlike a post
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                post_id:
+                  type: string
+
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                description: like or unlike
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: post_id
+          in: body
+          description: post id
+          schema:
+            type: string
+        - name: user_id
+          in: body
+          description: user id
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: device_token
+          in: header
+          description: Device token for notifications
+          schema:
+            type: string
+
+  /posts/{post_id}/bookmarks:
+    post:
+      summary: Post Bookmark
+      tags:
+        - post
+      requestBody:
+        description: Allows scouts to bookmark a post
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                post_id:
+                  type: string
+
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                description: bookmark
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: post_id
+          in: path
+          description: post id
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: user id
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+
+  /posts/bookmarks:
+    get:
+      summary: returns a scout's bookmarked posts
+      tags:
+        - post
+      description: A query that returns a scouts bookmarked posts
+      responses:
+        "200":
+          description: returns a list of bookmarked post
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+      parameters:
+        - name: userId
+          in: header
+          description: user id
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+  /posts/{id}/points:
+    post:
+      summary: Post View Point
+      tags:
+        - post
+      requestBody:
+        description: calculating post view points based on user interaction
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                view_time:
+                  type: number
+                  format: integer
+                post_duration:
+                  type: number
+                  format: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: calculate post view user interaction
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Post ID
+          schema:
+            type: string
+  /posts/{id}:
+    delete:
+      summary: delete a post
+      tags:
+        - post
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Post deleted
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Post ID
+          schema:
+            type: string
+  /posts/{id}/shares:
+    post:
+      summary: A query to persist the post share comment_count
+      tags:
+        - post
+      requestBody:
+        description: object containingn shared post information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                social_media_channel:
+                  type: string
+                user_id:
+                  type: string
+      responses:
+        "200":
+          description: shared post information
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Post Shared
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                type: string
+                description: NOT FOUND
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: user id
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: Post ID
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: next set of posts
+          schema:
+            type: integer
+  /comments:
+    post:
+      summary: allows mauditioners to comment on posts
+      tags:
+        - comment
+      requestBody:
+        description: object containing a user info
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Comment"
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: string
+                description: User created
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Bad Request
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: comment
+          in: body
+          description: the comment
+          schema:
+            type: string
+        - name: post_id
+          in: body
+          description: Post ID
+          schema:
+            type: string
+        - name: user_id
+          in: body
+          description: Commenter ID
+          schema:
+            type: string
+        - name: device_token
+          in: header
+          description: Device Token for notificaion
+          schema:
+            type: string
+  /notifications/:
+    get:
+      summary: Get a user's notifications
+      tags:
+        - notification
+      description: Get a user's notifications
+      responses:
+        "200":
+          description: Get a user's notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: notifications not found
+          content: {}
+      parameters:
+        - name: user_id
+          in: header
+          description: user id to get notifications for
+          schema:
+            type: string
+  /notifications/fcmtoken:
+    post:
+      summary: Get notification
+      tags:
+        - notification
+      description: sends FCM notification Token to backend
+      responses:
+        "200":
+          description: sends FCM notification Token to backend
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: User not found
+          content: {}
+      parameters:
+        - name: user_id
+          in: header
+          description: user id to for generated token
+          schema:
+            type: string
+        - name: fcm_token
+          in: header
+          description: Firebase generated token
+          schema:
+            type: string
+  /competitions/posts:
+    get:
+      summary: returns a list of all posts in competitions
+      tags:
+        - competition
+      description: A query that returns the list of all posts based on competitions
+      responses:
+        "200":
+          description: returns a lists of all posts based on competitions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Competition"
+      parameters:
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: no of post to offset format
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: competition status
+          schema:
+            type: string
+            example: published or closed or draft
+        - name: user_id
+          in: header
+          description: User ID
+          schema:
+            type: string
+  /competitions:
+    post:
+      summary: creates a new post
+      tags:
+        - competition
+      requestBody:
+        description: object containing a post info
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                banner:
+                  type: string
+                  format: binary
+                adBanner:
+                  type: string
+                  format: binary
+                status:
+                  type: string
+                  example: draft or published or closed
+                title:
+                  type: string
+                description:
+                  type: string
+                competition_type:
+                  type: string
+                  example: paid or free
+                fee:
+                  type: number
+                  format: double
+                submission_start_date:
+                  type: string
+                  format: date-time
+                submission_end_date:
+                  type: string
+                  format: date-time
+                vote_start_date:
+                  type: string
+                  format: date-time
+                vote_end_date:
+                  type: string
+                  format: date-time
+                owner_id:
+                  type: string
+                criteria:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                content: {}
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Bad Request
+
+  /competitions/{id}/posts:
+    put:
+      summary: Edits the fields of a competition
+      tags:
+        - competition
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: draft or published or closed
+                title:
+                  type: string
+                description:
+                  type: string
+                competition_type:
+                  type: string
+                  example: paid or free
+                fee:
+                  type: number
+                  format: double
+                submission_start_date:
+                  type: string
+                  format: date-time
+                submission_end_date:
+                  type: string
+                  format: date-time
+                vote_start_date:
+                  type: string
+                  format: date-time
+                vote_end_date:
+                  type: string
+                  format: date-time
+                owner_id:
+                  type: string
+                criteria:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Successfully Updated
+          content: {}
+        "400":
+          description: Invalid competition id
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of competition to use
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+    get:
+      summary: return a competition
+      tags:
+        - competition
+      description: A query that returns a competition and all posts in that competition
+      responses:
+        "200":
+          description: returns a lists of all posts based on a competition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Competition"
+      parameters:
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: no of post to offset format
+          schema:
+            type: integer
+        - name: id
+          in: path
+          description: unique id competition to get
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: User ID
+          schema:
+            type: string
+    post:
+      summary: create a new post in a competition
+      tags:
+        - competition
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                # 'file' will be the field name in this multipart request
+                media_url:
+                  type: string
+                  format: binary
+                thumbnail_url:
+                  type: string
+                  format: binary
+                user_id:
+                  type: string
+                category_id:
+                  type: string
+                hashtag:
+                  type: array
+                  items:
+                    type: string
+                caption:
+                  type: string
+                post_duration:
+                  type: number
+                  description: in seconds
+                  format: integer
+      responses:
+        "201":
+          description: Post created
+          content: {}
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of competition to use
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: logged-in user ID
+          schema:
+            type: string
+  /competitions/{id}/vote:
+    post:
+      summary: Vote in a competition
+      tags:
+        - competition
+      requestBody:
+        description: object containing a user info
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post_id:
+                  type: string
+                user_id:
+                  type: string
+                status:
+                  type: string
+      responses:
+        "200":
+          description: Voted successfully
+          content: {}
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of competition to use
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: up vote or down vote
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+  /competitions/{id}/posts/toppers:
+    get:
+      summary: Get posts toppers in a competition
+      tags:
+        - competition
+      requestBody:
+        description: object containing a post details
+        content:
+          application/json:
+      responses:
+        "200":
+          description: Successfully
+          content: {}
+        "404":
+          description: Not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of competition
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: id of logged-in user
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+  /competitions/{id}/subscribe:
+    put:
+      summary: subscribe to a competition
+      tags:
+        - competition
+      responses:
+        "201":
+          description: successfully subscribed to competition
+          content: {}
+        "400":
+          description: Bad request
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of competition to subscribe to
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: ID of logged-in user
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+  /competitions/{id}/banners:
+    put:
+      summary: Update a competition's banner or adBanner. Only one of these can be updated at a time.
+      tags:
+        - competition
+      requestBody:
+        description: Fill in required field to update a banner or adBanner
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                adBanner:
+                  description: Ad-banner image (required for adBanner update)
+                  type: string
+                  format: binary
+                id:
+                  description: Id of banner to update (required for banner update)
+                  type: string
+                banner:
+                  description: Banner image (required for banner update)
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: updated successfuly
+          content: {}
+        "400":
+          description: Bad request
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: ID of the competition
+          required: true
+          schema:
+            type: string
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+  /competitions/{id}/status:
+    put:
+      summary: Update competition status
+      tags:
+        - competition
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Competition status updated successfully
+        "404":
+          description: Competition not found
+          content: {}
+      parameters:
+        - name: x_request_otp_token
+          in: header
+          description: generated token
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: competition id
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: competition status
+          required: true
+          schema:
+            type: string
+            example: draft or published or closed
+  /competitions/{id}/judges:
+    post:
+      summary: add judges to competition
+      tags:
+        - competition
+      description: register judges to a specific competition
+      requestBody:
+        description: object containing a judges ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                judges:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: string
+                description: judges registered
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Not Found
+      parameters:
+        - name: id
+          in: path
+          description: competition id
+          schema:
+            type: string
+
+    delete:
+      summary: remove judges to competition
+      tags:
+        - competition
+      description: remove judges from a specific competition
+      requestBody:
+        description: object containing a judges ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                judgeId:
+                  type: string
+      responses:
+        "200":
+          description: removed successfully
+          content:
+            application/json:
+              schema:
+                type: string
+                description: judge removed
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Not Found
+      parameters:
+        - name: id
+          in: path
+          description: competition id
+          schema:
+            type: string
+  /competitions/splash:
+    get:
+      summary: Get top three competitions
+      tags:
+        - competition
+      description: Get top three competitions
+      responses:
+        "200":
+          description: Top three competition
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  adbanner_url:
+                    type: string
+        "500":
+          description: Something went wrong
+          content: {}
+  /hashtags/posts:
+    get:
+      summary: Get all hashtag
+      tags:
+        - hashtag
+      description: Get all hashtag and posts
+      responses:
+        "200":
+          description: Get all hashtags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Hashtag"
+        "500":
+          description: Something went wrong
+          content: {}
+      parameters:
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: no of post to offset format
+          schema:
+            type: integer
+  /hashtags:
+    post:
+      summary: create new hashtag
+      tags:
+        - hashtag
+      requestBody:
+        description: object containing a hashtag info
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: string
+                description: hashtag created
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Bad Request
+  /hashtags/{id}/posts:
+    get:
+      summary: Get one hashtag and all sub posts
+      tags:
+        - hashtag
+      description: Get one hashtag and all sub posts
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hashtag"
+        "404":
+          description: Hashtag not found
+          content: {}
+      parameters:
+        - name: id
+          in: path
+          description: hashtag id
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: no of post to offset format
+          schema:
+            type: integer
+  /legal/privacy-policy:
+    get:
+      summary: Get privacy policy
+      tags:
+        - legal
+      responses:
+        "200":
+          description: success
+          content:
+            application/html:
+              schema:
+                type: string
+        "500":
+          description: Something went wrong
+          content: {}
+  /legal/terms:
+    get:
+      summary: Get terms of service
+      tags:
+        - legal
+      responses:
+        "200":
+          description: success
+          content:
+            application/html:
+              schema:
+                type: string
+        "500":
+          description: Something went wrong
+          content: {}
+  /payment/:
+    get:
+      summary: validate Payment Reference
+      tags:
+        - payment Reference
+      description: Validate Payment Reference
+      parameters:
+        - name: reference
+          in: query
+          description: paystack generated payment reference
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Validate Payment Reference
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gateway_response:
+                    type: string
+
+        "500":
+          description: Something went wrong
+          content: {}
+  /categories/posts:
+    get:
+      summary: returns a list of all posts in category
+      tags:
+        - category
+      description: A query that returns the list of all posts based on category
+      responses:
+        "200":
+          description: returns a lists of all posts based on category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+      parameters:
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: no of post to offset format
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: User ID
+          schema:
+            type: string
+  /categories/{id}/posts:
+    get:
+      summary: returns a post and all other posts in the same category
+      tags:
+        - category
+      description: A query that returns a post and other related post in the same category
+      responses:
+        "200":
+          description: returns a post
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+      parameters:
+        - name: id
+          in: path
+          description: category id
+          required: true
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: no of post to offset format
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: User ID
+          schema:
+            type: string
+  /categories:
+    post:
+      summary: Creates a new category
+      tags:
+        - category
+      requestBody:
+        description: object containing a hashtag info
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "201":
+          description: Post created
+          content: {}
+        "404":
+          description: Not found
+          content: {}
+    get:
+      summary: returns a list of all category
+      tags:
+        - category
+      description: A query that returns the list of categories
+      responses:
+        "200":
+          description: returns a lists of all posts based on category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+      parameters:
+        - name: x_auth_token
+          in: header
+          description: token for authorization
+          schema:
+            type: string
+        - name: user_id
+          in: header
+          description: User ID
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          description: No of post to get
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: next set of posts
+          schema:
+            type: integer
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        auth_id:
+          type: string
+        auth_type:
+          type: string
+        username:
+          type: string
+        fullname:
+          type: string
+        password:
+          type: string
+        role:
+          type: integer
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        category_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        media_url:
+          type: string
+        thumbnail_url:
+          type: string
+        created_at:
+          type: string
+        user-info:
+          type: object
+          properties:
+            fullname:
+              type: string
+            username:
+              type: string
+            avatar:
+              type: string
+        comments:
+          type: array
+          items:
+            type: object
+            properties:
+              comment_id:
+                type: string
+              commenter_id:
+                type: string
+              commenter_avatar:
+                type: string
+              commenter_name:
+                type: string
+              comment:
+                type: string
+              created_at:
+                type: string
+        comment_count:
+          type: integer
+        like_count:
+          type: integer
+        post_shares_count:
+          type: integer
+    Comment:
+      type: object
+      properties:
+        comment:
+          type: string
+        post_id:
+          type: string
+        user_id:
+          type: string
+    Hashtag:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        posts:
+          type: object
+          properties:
+            id:
+              type: string
+            title:
+              type: string
+            description:
+              type: string
+            media_url:
+              type: string
+            thumbnail_url:
+              type: string
+            user_id:
+              type: string
+    Talent:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        category_id:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    Newsfeed:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: integer
+        category_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        media_url:
+          type: string
+        like_count:
+          type: integer
+        comment_count:
+          type: integer
+    Category:
+      type: object
+      properties:
+        talent:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            posts:
+              type: array
+              items:
+                type: object
+                $ref: "#/components/schemas/Post"
+    Competition:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        competition_post:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              title:
+                type: string
+              description:
+                type: string
+              media_url:
+                type: string
+              thumbnail_url:
+                type: string
+        competition_banner:
+          type: object
+          properties:
+            id:
+              type: string
+            banner_url:
+              type: string
+        competition_video:
+          type: object
+          properties:
+            id:
+              type: string
+            video_url:
+              type: string
+    Profile:
+      type: object
+      properties:
+        details:
+          type: object
+          properties:
+            id:
+              type: string
+            auth_id:
+              type: string
+            auth_type:
+              type: string
+            username:
+              type: string
+            fullname:
+              type: string
+            email:
+              type: string
+            phone_number:
+              type: string
+            profile_picture:
+              type: string
+            gender:
+              type: string
+            height:
+              type: string
+            date_of_birth:
+              type: string
+            eye_color:
+              type: string
+            skin_color:
+              type: string
+            biography:
+              type: string
+            website:
+              type: string
+            address:
+              type: string
+            follower_count:
+              type: integer
+            following_count:
+              type: integer
+            post_like_count:
+              type: integer
+    Follower:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          avatar:
+            type: string
+          name:
+            type: string
+          username:
+            type: string
+    Following:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          avatar:
+            type: string
+          name:
+            type: string
+          username:
+            type: string
+    Like:
+      type: object
+      properties:
+        status:
+          type: integer
+        user_id:
+          type: string
+        post_id:
+    Update:
+      type: object
+      properties:
+        username:
+          type: string
+        fullname:
+          type: string
+        avatar:
+          type: string
+        email:
+          type: string
+        phone_number:
+          type: string
+        gender:
+          type: string
+        height:
+          type: number
+          format: float
+        date_of_birth:
+          type: string
+          format: date
+        eye_colour:
+          type: string
+        skin_colour:
+          type: string
+        biography:
+          type: string
+        website:
+          type: string
+        address:
+          type: string
+
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
