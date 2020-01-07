@@ -1,3 +1,2 @@
-# Maudition API
+# CHORD
 
-The Maudition backend API code

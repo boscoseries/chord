@@ -4,7 +4,7 @@ const environments = {};
 
 const sharedEnvVariables = {
   hashingSecret: process.env.MY_SECRET || 'xyz',
-  httpPort: 8080,
+  httpPort: process.env.PORT || 3000,
   accessKeyId: process.env.ACCESS_KEY_ID,
   secretAccessKey: process.env.SECRET_ACCESS_KEY,
   bucketName: process.env.BUCKET_NAME,
