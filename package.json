@@ -30,7 +30,7 @@
     "formidable": "^1.2.1",
     "helmet": "^3.21.2",
     "joi": "^14.3.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "languages-js": "^2.2.8",
     "lodash": "^4.17.14",
     "morgan": "^1.9.1",
